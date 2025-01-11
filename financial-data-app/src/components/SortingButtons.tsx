@@ -1,5 +1,5 @@
 import React from "react";
-import { IncomeStatement } from "../types"; // if you have a separate type definition
+import { IncomeStatement } from "../types.ts"; // if you have a separate type definition
 
 interface SortingButtonsProps {
   onSort: (key: keyof IncomeStatement, order: "asc" | "desc") => void;

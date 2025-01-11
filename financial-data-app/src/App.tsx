@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import FilterBar from "./components/FilterBar";
 import Table from "./components/Table";
 import SortingButtons from "./components/SortingButtons";
+import ChartComponent from "./components/ChartComponent"; // Import the Chart component
 
 interface IncomeStatement {
   date: string;
@@ -16,6 +17,7 @@ interface IncomeStatement {
 const App: React.FC = () => {
   const [data, setData] = useState<IncomeStatement[]>([]);
   const [filteredData, setFilteredData] = useState<IncomeStatement[]>([]);
+  const [selectedField, setSelectedField] = useState<string>("revenue"); // Default field for charting
 
   // Filter states
   const [startYear, setStartYear] = useState<number>(2020);
@@ -27,12 +29,10 @@ const App: React.FC = () => {
 
   useEffect(() => {
     fetch(
-      "https://financialmodelingprep.com/api/v3/income-statement/AAPL?period=annual?apikey=AK7ehNsAb4qCAO31DlXVIbmXxMM5Soge&apikey=AK7ehNsAb4qCAO31DlXVIbmXxMM5Soge"
+      "https://financialmodelingprep.com/api/v3/income-statement/AAPL?period=annual&apikey=AK7ehNsAb4qCAO31DlXVIbmXxMM5Soge"
     )
       .then((res) => res.json())
       .then((resData) => {
-        // Transform the data if needed;
-        // The API returns an array with objects having keys like 'revenue', 'netIncome', etc.
         const transformed: IncomeStatement[] = resData.map((item: any) => ({
           date: item.date,
           revenue: item.revenue,
@@ -52,26 +52,11 @@ const App: React.FC = () => {
     const newFilteredData = data.filter((row) => {
       const year = new Date(row.date).getFullYear();
 
-      // 1. Date range filter
-      if (year < startYear || year > endYear) {
-        return false;
-      }
-
-      // 2. Revenue range filter
-      if (minRevenue !== null && row.revenue < minRevenue) {
-        return false;
-      }
-      if (maxRevenue !== null && row.revenue > maxRevenue) {
-        return false;
-      }
-
-      // 3. Net income range filter
-      if (minNetIncome !== null && row.netIncome < minNetIncome) {
-        return false;
-      }
-      if (maxNetIncome !== null && row.netIncome > maxNetIncome) {
-        return false;
-      }
+      if (year < startYear || year > endYear) return false;
+      if (minRevenue !== null && row.revenue < minRevenue) return false;
+      if (maxRevenue !== null && row.revenue > maxRevenue) return false;
+      if (minNetIncome !== null && row.netIncome < minNetIncome) return false;
+      if (maxNetIncome !== null && row.netIncome > maxNetIncome) return false;
 
       return true;
     });
@@ -94,7 +79,6 @@ const App: React.FC = () => {
         const dateB = new Date(b.date).getTime();
         return order === "asc" ? dateA - dateB : dateB - dateA;
       } else {
-        // For numeric fields
         const valA = a[key] as number;
         const valB = b[key] as number;
         return order === "asc" ? valA - valB : valB - valA;
@@ -103,12 +87,16 @@ const App: React.FC = () => {
     setFilteredData(sorted);
   };
 
+  // Handle changing the charted field
+  const handleFieldChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedField(event.target.value);
+  };
+
   return (
     <div className="p-4 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold text-center mb-4">
-        Financial Data Filtering App (AAPL)
+        Financial Data Filtering & Visualization (AAPL)
       </h1>
-
       {/* Filter Bar */}
       <FilterBar
         startYear={startYear}
@@ -124,12 +112,27 @@ const App: React.FC = () => {
         setMinNetIncome={setMinNetIncome}
         setMaxNetIncome={setMaxNetIncome}
       />
-
       {/* Sorting Buttons */}
       <SortingButtons onSort={handleSort} />
-
+      {/* Chart Field Selector */}
+      <div className="flex justify-center mb-4">
+        <select
+          value={selectedField}
+          onChange={handleFieldChange}
+          className="border border-gray-300 rounded px-4 py-2"
+        >
+          <option value="revenue">Revenue</option>
+          <option value="netIncome">Net Income</option>
+          <option value="grossProfit">Gross Profit</option>
+          <option value="eps">EPS</option>
+          <option value="operatingIncome">Operating Income</option>
+        </select>
+      </div>
+      {/* Chart */}
+      <ChartComponent data={filteredData} selectedField={selectedField} />
       {/* Data Table */}
-      <Table data={filteredData} />
+
+      {/*<Table data={filteredData} />*/}
     </div>
   );
 };
