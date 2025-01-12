@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import FilterBar from "./components/FilterBar";
 import Table from "./components/Table";
 import SortingButtons from "./components/SortingButtons";
-import ChartComponent from "./components/ChartComponent"; // Import the Chart component
+import ChartComponent from "./components/ChartComponent";
 
 interface IncomeStatement {
   date: string;
@@ -13,6 +13,12 @@ interface IncomeStatement {
   operatingIncome: number;
   // ... other fields from the API if needed
 }
+
+const sampleData = [
+  { date: "2024-09-28", revenue: 391035000000 },
+  { date: "2023-09-30", revenue: 383285000000 },
+  { date: "2022-09-24", revenue: 394328000000 },
+];
 
 const App: React.FC = () => {
   const [data, setData] = useState<IncomeStatement[]>([]);
@@ -27,6 +33,7 @@ const App: React.FC = () => {
   const [minNetIncome, setMinNetIncome] = useState<number | null>(null);
   const [maxNetIncome, setMaxNetIncome] = useState<number | null>(null);
 
+  // Fetch data from API on mount
   useEffect(() => {
     fetch(
       "https://financialmodelingprep.com/api/v3/income-statement/AAPL?period=annual&apikey=AK7ehNsAb4qCAO31DlXVIbmXxMM5Soge"
@@ -93,46 +100,66 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="p-4 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold text-center mb-4">
-        Financial Data Filtering & Visualization (AAPL)
-      </h1>
-      {/* Filter Bar */}
-      <FilterBar
-        startYear={startYear}
-        endYear={endYear}
-        setStartYear={setStartYear}
-        setEndYear={setEndYear}
-        minRevenue={minRevenue}
-        maxRevenue={maxRevenue}
-        setMinRevenue={setMinRevenue}
-        setMaxRevenue={setMaxRevenue}
-        minNetIncome={minNetIncome}
-        maxNetIncome={maxNetIncome}
-        setMinNetIncome={setMinNetIncome}
-        setMaxNetIncome={setMaxNetIncome}
-      />
-      {/* Sorting Buttons */}
-      <SortingButtons onSort={handleSort} />
-      {/* Chart Field Selector */}
-      <div className="flex justify-center mb-4">
-        <select
-          value={selectedField}
-          onChange={handleFieldChange}
-          className="border border-gray-300 rounded px-4 py-2"
-        >
-          <option value="revenue">Revenue</option>
-          <option value="netIncome">Net Income</option>
-          <option value="grossProfit">Gross Profit</option>
-          <option value="eps">EPS</option>
-          <option value="operatingIncome">Operating Income</option>
-        </select>
-      </div>
-      {/* Chart */}
-      <ChartComponent data={filteredData} selectedField={selectedField} />
-      {/* Data Table */}
+    // Overall page container with white bg & black text, and full viewport height
+    <div className="bg-white text-black min-h-screen">
+      <div className="p-4 max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold text-center mb-6">
+          Financial Data Filtering & Visualization (AAPL)
+        </h1>
 
-      {/*<Table data={filteredData} />*/}
+        {/* Filters & Sorting */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="bg-white p-4 rounded shadow">
+            <h2 className="text-xl font-semibold mb-2">Filters</h2>
+            <FilterBar
+              startYear={startYear}
+              endYear={endYear}
+              setStartYear={setStartYear}
+              setEndYear={setEndYear}
+              minRevenue={minRevenue}
+              maxRevenue={maxRevenue}
+              setMinRevenue={setMinRevenue}
+              setMaxRevenue={setMaxRevenue}
+              minNetIncome={minNetIncome}
+              maxNetIncome={maxNetIncome}
+              setMinNetIncome={setMinNetIncome}
+              setMaxNetIncome={setMaxNetIncome}
+            />
+          </div>
+
+          <div className="bg-white p-4 rounded shadow">
+            <h2 className="text-xl font-semibold mb-2">Sorting</h2>
+            {/* SortingButtons now includes green button styling */}
+            <SortingButtons onSort={handleSort} />
+          </div>
+        </div>
+
+        {/* Chart Section */}
+        <div className="bg-white p-4 rounded shadow mb-6">
+          <div className="flex justify-center mb-4">
+            <label className="mr-2 font-medium">Select Metric:</label>
+            <select
+              value={selectedField}
+              onChange={handleFieldChange}
+              className="border border-gray-300 rounded px-4 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
+            >
+              <option value="revenue">Revenue</option>
+              <option value="netIncome">Net Income</option>
+              <option value="grossProfit">Gross Profit</option>
+              <option value="eps">EPS</option>
+              <option value="operatingIncome">Operating Income</option>
+            </select>
+          </div>
+
+          <ChartComponent data={filteredData} selectedField={selectedField} />
+        </div>
+
+        {/* Table Section */}
+        <div className="bg-white p-4 rounded shadow">
+          <h2 className="text-xl font-semibold mb-2">Filtered Results</h2>
+          <Table data={filteredData} />
+        </div>
+      </div>
     </div>
   );
 };
