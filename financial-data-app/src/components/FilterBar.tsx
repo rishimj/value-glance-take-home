@@ -31,7 +31,6 @@ const FilterBar: React.FC<FilterBarProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-6 mb-4">
-      {/* Date Range */}
       <div className="flex gap-4 items-center">
         <label className="text-gray-700 font-medium">Date Range:</label>
         <div className="flex gap-2 items-center">
@@ -53,7 +52,6 @@ const FilterBar: React.FC<FilterBarProps> = ({
         </div>
       </div>
 
-      {/* Revenue Range */}
       <div className="flex gap-4 items-center">
         <label className="text-gray-700 font-medium">Revenue Range:</label>
         <div className="flex gap-2 items-center">
@@ -79,7 +77,6 @@ const FilterBar: React.FC<FilterBarProps> = ({
         </div>
       </div>
 
-      {/* Net Income Range */}
       <div className="flex gap-4 items-center">
         <label className="text-gray-700 font-medium">Net Income Range:</label>
         <div className="flex gap-2 items-center">
@@ -99,8 +96,6 @@ const FilterBar: React.FC<FilterBarProps> = ({
             placeholder="Max Net Income"
             value={maxNetIncome ?? ""}
             onChange={(e) => {
-              const value = e.target.value ? Number(e.target.value) : null;
-              console.log("Max Net Income Input:", value); // Debugging log
               setMaxNetIncome(e.target.value ? Number(e.target.value) : null);
             }}
           />

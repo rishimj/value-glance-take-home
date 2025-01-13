@@ -1,5 +1,5 @@
 import React from "react";
-import { IncomeStatement } from "../types.ts"; // Replace with your actual types file path
+import { IncomeStatement } from "../types.ts";
 
 interface SortingDropdownProps {
   onSort: (key: keyof IncomeStatement, order: "asc" | "desc") => void;
@@ -15,7 +15,6 @@ const SortingDropdown: React.FC<SortingDropdownProps> = ({ onSort }) => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Dropdown for Date */}
       <div className="flex flex-col">
         <label htmlFor="date-sort" className="text-gray-700 font-medium mb-1">
           Sort by Date:
@@ -33,7 +32,6 @@ const SortingDropdown: React.FC<SortingDropdownProps> = ({ onSort }) => {
         </select>
       </div>
 
-      {/* Dropdown for Revenue */}
       <div className="flex flex-col">
         <label
           htmlFor="revenue-sort"
@@ -54,7 +52,6 @@ const SortingDropdown: React.FC<SortingDropdownProps> = ({ onSort }) => {
         </select>
       </div>
 
-      {/* Dropdown for Net Income */}
       <div className="flex flex-col">
         <label
           htmlFor="net-income-sort"

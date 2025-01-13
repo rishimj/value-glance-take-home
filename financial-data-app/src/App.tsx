@@ -4,6 +4,7 @@ import Table from "./components/Table";
 import SortingButtons from "./components/SortingButtons";
 import ChartComponent from "./components/ChartComponent";
 import "./output.css";
+
 interface IncomeStatement {
   date: string;
   revenue: number;
@@ -11,21 +12,15 @@ interface IncomeStatement {
   grossProfit: number;
   eps: number;
   operatingIncome: number;
-  // ... other fields from the API if needed
 }
-
-const sampleData = [
-  { date: "2024-09-28", revenue: 391035000000 },
-  { date: "2023-09-30", revenue: 383285000000 },
-  { date: "2022-09-24", revenue: 394328000000 },
-];
 
 const App: React.FC = () => {
   const [data, setData] = useState<IncomeStatement[]>([]);
   const [filteredData, setFilteredData] = useState<IncomeStatement[]>([]);
-  const [selectedField, setSelectedField] = useState<string>("revenue"); // Default field for charting
+  const [selectedField, setSelectedField] = useState<
+    "revenue" | "netIncome" | "grossProfit" | "eps" | "operatingIncome"
+  >("revenue"); // Restrict selectedField to known keys
 
-  // Filter states
   const [startYear, setStartYear] = useState<number>(2020);
   const [endYear, setEndYear] = useState<number>(2025);
   const [minRevenue, setMinRevenue] = useState<number | null>(null);
@@ -33,7 +28,7 @@ const App: React.FC = () => {
   const [minNetIncome, setMinNetIncome] = useState<number | null>(null);
   const [maxNetIncome, setMaxNetIncome] = useState<number | null>(null);
 
-  // Fetch data from API on mount
+  // Fetch Data
   useEffect(() => {
     fetch(
       "https://financialmodelingprep.com/api/v3/income-statement/AAPL?period=annual&apikey=AK7ehNsAb4qCAO31DlXVIbmXxMM5Soge"
@@ -54,7 +49,7 @@ const App: React.FC = () => {
       .catch((err) => console.error("Error fetching data:", err));
   }, []);
 
-  // Filtering logic
+  // Apply Filters
   useEffect(() => {
     const newFilteredData = data.filter((row) => {
       const year = new Date(row.date).getFullYear();
@@ -78,7 +73,7 @@ const App: React.FC = () => {
     maxNetIncome,
   ]);
 
-  // Sorting function
+  // Handle Sorting
   const handleSort = (key: keyof IncomeStatement, order: "asc" | "desc") => {
     const sorted = [...filteredData].sort((a, b) => {
       if (key === "date") {
@@ -94,24 +89,27 @@ const App: React.FC = () => {
     setFilteredData(sorted);
   };
 
-  // Handle changing the charted field
+  // Handle Selected Field Change
   const handleFieldChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedField(event.target.value);
+    setSelectedField(
+      event.target.value as
+        | "revenue"
+        | "netIncome"
+        | "grossProfit"
+        | "eps"
+        | "operatingIncome"
+    );
   };
 
   return (
-    // Overall page container with white bg & black text, and full viewport height
     <div className="bg-gradient-to-br from-blue-50 via-white to-green-50 min-h-screen">
-      {/* Page Title */}
       <header className="bg-gradient-to-r from-blue-500 to-green-500 text-white py-8">
-        <h1 className="text-4xl font-extrabold text-center tracking-wide">
+        <h1 className="text-9xl font-extrabold text-center tracking-wide">
           Financial Data Filtering & Visualization (AAPL)
         </h1>
       </header>
 
-      {/* Main Content */}
       <main className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Panel: Filters & Sorting */}
         <aside className="lg:col-span-3 bg-white p-6 rounded-xl shadow-xl">
           <h2 className="text-2xl font-bold text-blue-600 mb-6">
             Filters & Sorting
@@ -139,9 +137,7 @@ const App: React.FC = () => {
           </section>
         </aside>
 
-        {/* Right Panel: Chart & Table */}
         <div className="lg:col-span-9 space-y-8">
-          {/* Chart Section */}
           <section className="bg-white p-8 rounded-xl shadow-xl">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-green-600">Chart</h2>
@@ -169,7 +165,6 @@ const App: React.FC = () => {
             <ChartComponent data={filteredData} selectedField={selectedField} />
           </section>
 
-          {/* Table Section */}
           <section className="bg-white p-8 rounded-xl shadow-xl">
             <h2 className="text-2xl font-bold text-blue-600 mb-6">
               Filtered Results

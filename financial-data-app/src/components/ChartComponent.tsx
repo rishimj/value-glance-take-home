@@ -2,15 +2,26 @@ import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
 interface ChartData {
-  [key: string]: any;
-  date: string; // or date as a string, e.g. "2024-09-28"
+  date: string;
+  dateObj?: Date; // Added for parsed dates
+  revenue?: number;
+  netIncome?: number;
+  grossProfit?: number;
+  eps?: number;
+  operatingIncome?: number;
+  [key: string]: any; // Dynamic keys for additional fields
 }
 
 interface ChartComponentProps {
   data: ChartData[];
-  selectedField: string; // e.g. "revenue", "netIncome"
-  width?: number; // optionally allow parent to specify width
-  height?: number; // optionally allow parent to specify height
+  selectedField:
+    | "revenue"
+    | "netIncome"
+    | "grossProfit"
+    | "eps"
+    | "operatingIncome"; // Expanded fields
+  width?: number;
+  height?: number;
 }
 
 const ChartComponent: React.FC<ChartComponentProps> = ({
@@ -24,98 +35,91 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
   useEffect(() => {
     if (!data || data.length === 0) return;
 
-    // Remove any existing SVG to redraw from scratch
+    // Clear existing SVG
     d3.select(chartRef.current).select("svg").remove();
 
-    // Margins for axes and labels
-    const margin = { top: 40, right: 40, bottom: 60, left: 100 };
+    // Margins and dimensions
+    const margin = { top: 40, right: 40, bottom: 60, left: 120 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
-    // Create an SVG element
+    // Create SVG container
     const svg = d3
       .select(chartRef.current)
       .append("svg")
       .attr("width", width)
       .attr("height", height);
 
-    // Main chart group (account for margins)
     const g = svg
       .append("g")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    // Parse date if needed
+    // Parse and enrich data
     const parseDate = d3.timeParse("%Y-%m-%d");
-    const chartData = data.map((d) => {
-      const parsed = parseDate(d.date);
-      return {
-        ...d,
-        dateObj: parsed || new Date(d.date), // fallback if parse fails
-      };
-    });
+    const chartData = data.map((d) => ({
+      ...d,
+      dateObj: parseDate(d.date) || new Date(d.date), // Fallback if parsing fails
+    }));
 
-    // Define scales
+    // Scales
     const xScale = d3
       .scaleTime()
       .domain(d3.extent(chartData, (d) => d.dateObj) as [Date, Date])
       .range([0, innerWidth])
-      .nice(); // neatens domain
+      .nice();
 
     const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(chartData, (d) => +d[selectedField]) || 0])
+      .domain([0, d3.max(chartData, (d) => d[selectedField] as number) || 0])
       .range([innerHeight, 0])
       .nice();
 
-    // Color the line based on field (optional)
-    // e.g. single color or category-based scale
+    // Colors
     const color = d3.scaleOrdinal(d3.schemeCategory10);
     const lineColor = color(selectedField);
 
     // Axes
-    const xAxis = d3.axisBottom<Date>(xScale).ticks(6); // ~6 ticks
-    const yAxis = d3.axisLeft<number>(yScale).ticks(6); // ~6 ticks
+    const xAxis = d3.axisBottom<Date>(xScale).ticks(6);
+    const yAxis = d3.axisLeft<number>(yScale).ticks(6);
 
-    // Append X-axis
+    // Draw X-axis
     g.append("g")
       .attr("transform", `translate(0, ${innerHeight})`)
       .call(xAxis)
-      .call(
-        (g) =>
-          g
-            .append("text")
-            .attr("x", innerWidth / 2)
-            .attr("y", 40) // move label below axis
-            .attr("fill", "currentColor")
-            .attr("text-anchor", "middle")
-            .attr("font-size", "14")
-            .text("Date") // X-axis label
+      .call((g) =>
+        g
+          .append("text")
+          .attr("x", innerWidth / 2)
+          .attr("y", 40)
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "middle")
+          .attr("font-size", "14")
+          .text("Date")
       );
 
-    // Append Y-axis
+    // Draw Y-axis
     g.append("g")
       .call(yAxis)
-      .call(
-        (g) =>
-          g
-            .append("text")
-            .attr("x", -innerHeight / 2)
-            .attr("y", -90) // move label to the left of axis
-            .attr("transform", "rotate(-90)")
-            .attr("fill", "currentColor")
-            .attr("text-anchor", "middle")
-            .attr("font-size", "14")
-            .text(selectedField) // Y-axis label
+      .call((g) =>
+        g
+          .append("text")
+          .attr("x", -innerHeight / 2)
+          .attr("y", -110)
+          .attr("transform", "rotate(-90)")
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "middle")
+          .attr("font-size", "14")
+          .text(selectedField)
       );
 
     // Line generator
     const lineGen = d3
-      .line<any>()
-      .x((d) => xScale(d.dateObj))
-      .y((d) => yScale(+d[selectedField]))
-      .curve(d3.curveMonotoneX); // smooth line
+      .line<ChartData>()
+      .x((d) => xScale(d.dateObj as Date))
+      .y((d) => yScale(d[selectedField] as number))
+      .curve(d3.curveMonotoneX);
 
-    // Append the path for the line
+    // Draw line
     g.append("path")
       .datum(chartData)
       .attr("fill", "none")
@@ -123,9 +127,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
       .attr("stroke-width", 2)
       .attr("d", lineGen);
 
-    // --- Tooltip Setup ---
-    // We create a tooltip DIV outside the SVG,
-    // so we can position it absolutely over the chart.
+    // Tooltip
     const tooltip = d3
       .select(chartRef.current)
       .append("div")
@@ -134,29 +136,26 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
       .style("border", "1px solid #ccc")
       .style("border-radius", "4px")
       .style("padding", "8px")
-      .style("pointer-events", "none") // let mouse pass through
-      .style("opacity", 0); // initially hidden
+      .style("pointer-events", "none")
+      .style("opacity", 0);
 
-    // Circles for each data point + mouse events for tooltip
+    // Data points
     g.selectAll(".dot")
       .data(chartData)
       .enter()
       .append("circle")
       .attr("class", "dot")
-      .attr("cx", (d) => xScale(d.dateObj))
-      .attr("cy", (d) => yScale(+d[selectedField]))
+      .attr("cx", (d) => xScale(d.dateObj as Date))
+      .attr("cy", (d) => yScale(d[selectedField] as number))
       .attr("r", 3)
       .attr("fill", lineColor || "#8884d8")
-      // Mouse events
       .on("mouseover", function (event, d) {
-        // highlight circle
         d3.select(this)
           .transition()
           .duration(100)
           .attr("r", 5)
           .attr("fill", "red");
 
-        // show tooltip
         tooltip
           .style("opacity", 1)
           .html(
@@ -169,20 +168,17 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
           .style("top", event.pageY - 28 + "px");
       })
       .on("mousemove", function (event) {
-        // update tooltip position as mouse moves
         tooltip
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 28 + "px");
       })
       .on("mouseout", function () {
-        // reset circle
         d3.select(this)
           .transition()
           .duration(100)
           .attr("r", 3)
           .attr("fill", lineColor || "#8884d8");
 
-        // hide tooltip
         tooltip.style("opacity", 0);
       });
   }, [data, selectedField, width, height]);
@@ -191,8 +187,8 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
     <div
       ref={chartRef}
       style={{
-        width: width + "px",
-        height: height + "px",
+        width: `${width}px`,
+        height: `${height}px`,
         position: "relative",
       }}
     />
