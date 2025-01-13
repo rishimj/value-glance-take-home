@@ -28,7 +28,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
     d3.select(chartRef.current).select("svg").remove();
 
     // Margins for axes and labels
-    const margin = { top: 40, right: 40, bottom: 60, left: 60 };
+    const margin = { top: 40, right: 40, bottom: 60, left: 100 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
@@ -100,7 +100,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
           g
             .append("text")
             .attr("x", -innerHeight / 2)
-            .attr("y", -50) // move label to the left of axis
+            .attr("y", -90) // move label to the left of axis
             .attr("transform", "rotate(-90)")
             .attr("fill", "currentColor")
             .attr("text-anchor", "middle")
@@ -130,7 +130,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
       .select(chartRef.current)
       .append("div")
       .style("position", "absolute")
-      .style("background-color", "#000")
+      .style("background-color", "#FFF")
       .style("border", "1px solid #ccc")
       .style("border-radius", "4px")
       .style("padding", "8px")

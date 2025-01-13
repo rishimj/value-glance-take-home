@@ -30,78 +30,81 @@ const FilterBar: React.FC<FilterBarProps> = ({
   setMaxNetIncome,
 }) => {
   return (
-    <div className="flex flex-col sm:flex-row gap-4 justify-between mb-4">
+    <div className="flex flex-col gap-6 mb-4">
       {/* Date Range */}
-      <div className="flex gap-2 items-center">
-        <label className="block">Start Year:</label>
-        <input
-          type="number"
-          className="border rounded p-1 w-20"
-          value={startYear}
-          onChange={(e) => setStartYear(Number(e.target.value))}
-        />
-      </div>
-
-      <div className="flex gap-2 items-center">
-        <label className="block">End Year:</label>
-        <input
-          type="number"
-          className="border rounded p-1 w-20"
-          value={endYear}
-          onChange={(e) => setEndYear(Number(e.target.value))}
-        />
+      <div className="flex gap-4 items-center">
+        <label className="text-gray-700 font-medium">Date Range:</label>
+        <div className="flex gap-2 items-center">
+          <input
+            type="number"
+            className="border rounded p-1 w-24"
+            placeholder="Start Year"
+            value={startYear}
+            onChange={(e) => setStartYear(Number(e.target.value))}
+          />
+          <span className="text-gray-500">to</span>
+          <input
+            type="number"
+            className="border rounded p-1 w-24"
+            placeholder="End Year"
+            value={endYear}
+            onChange={(e) => setEndYear(Number(e.target.value))}
+          />
+        </div>
       </div>
 
       {/* Revenue Range */}
-      <div className="flex gap-2 items-center">
-        <label className="block">Min Revenue:</label>
-        <input
-          type="number"
-          className="border rounded p-1 w-24"
-          placeholder="e.g. 50000"
-          value={minRevenue ?? ""}
-          onChange={(e) =>
-            setMinRevenue(e.target.value ? Number(e.target.value) : null)
-          }
-        />
-      </div>
-      <div className="flex gap-2 items-center">
-        <label className="block">Max Revenue:</label>
-        <input
-          type="number"
-          className="border rounded p-1 w-24"
-          placeholder="e.g. 100000"
-          value={maxRevenue ?? ""}
-          onChange={(e) =>
-            setMaxRevenue(e.target.value ? Number(e.target.value) : null)
-          }
-        />
+      <div className="flex gap-4 items-center">
+        <label className="text-gray-700 font-medium">Revenue Range:</label>
+        <div className="flex gap-2 items-center">
+          <input
+            type="number"
+            className="border rounded p-1 w-24"
+            placeholder="Min Revenue"
+            value={minRevenue ?? ""}
+            onChange={(e) =>
+              setMinRevenue(e.target.value ? Number(e.target.value) : null)
+            }
+          />
+          <span className="text-gray-500">to</span>
+          <input
+            type="number"
+            className="border rounded p-1 w-24"
+            placeholder="Max Revenue"
+            value={maxRevenue ?? ""}
+            onChange={(e) =>
+              setMaxRevenue(e.target.value ? Number(e.target.value) : null)
+            }
+          />
+        </div>
       </div>
 
       {/* Net Income Range */}
-      <div className="flex gap-2 items-center">
-        <label className="block">Min Net Income:</label>
-        <input
-          type="number"
-          className="border rounded p-1 w-24"
-          placeholder="e.g. 10000"
-          value={minNetIncome ?? ""}
-          onChange={(e) =>
-            setMinNetIncome(e.target.value ? Number(e.target.value) : null)
-          }
-        />
-      </div>
-      <div className="flex gap-2 items-center">
-        <label className="block">Max Net Income:</label>
-        <input
-          type="number"
-          className="border rounded p-1 w-24"
-          placeholder="e.g. 50000"
-          value={maxNetIncome ?? ""}
-          onChange={(e) =>
-            setMaxNetIncome(e.target.value ? Number(e.target.value) : null)
-          }
-        />
+      <div className="flex gap-4 items-center">
+        <label className="text-gray-700 font-medium">Net Income Range:</label>
+        <div className="flex gap-2 items-center">
+          <input
+            type="number"
+            className="border rounded p-1 w-24"
+            placeholder="Min Net Income"
+            value={minNetIncome ?? ""}
+            onChange={(e) =>
+              setMinNetIncome(e.target.value ? Number(e.target.value) : null)
+            }
+          />
+          <span className="text-gray-500">to</span>
+          <input
+            type="number"
+            className="border rounded p-1 w-24"
+            placeholder="Max Net Income"
+            value={maxNetIncome ?? ""}
+            onChange={(e) => {
+              const value = e.target.value ? Number(e.target.value) : null;
+              console.log("Max Net Income Input:", value); // Debugging log
+              setMaxNetIncome(e.target.value ? Number(e.target.value) : null);
+            }}
+          />
+        </div>
       </div>
     </div>
   );

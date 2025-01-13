@@ -104,7 +104,7 @@ const App: React.FC = () => {
     <div className="bg-gradient-to-br from-blue-50 via-white to-green-50 min-h-screen">
       {/* Page Title */}
       <header className="bg-gradient-to-r from-blue-500 to-green-500 text-white py-8">
-        <h1 className="text-16xl font-extrabold text-center tracking-wide">
+        <h1 className="text-4xl font-extrabold text-center tracking-wide">
           Financial Data Filtering & Visualization (AAPL)
         </h1>
       </header>
@@ -128,7 +128,8 @@ const App: React.FC = () => {
               setMinRevenue={setMinRevenue}
               setMaxRevenue={setMaxRevenue}
               minNetIncome={minNetIncome}
-              maxNetIncome={setMaxNetIncome}
+              maxNetIncome={maxNetIncome}
+              setMaxNetIncome={setMaxNetIncome}
               setMinNetIncome={setMinNetIncome}
             />
           </section>
