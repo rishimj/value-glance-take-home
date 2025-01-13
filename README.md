@@ -31,6 +31,7 @@ You can view the deployed app here:
    ```bash
    git clone https://github.com/rishimj/value-glance-take-home.git
    cd value-glance-take-home
+   cd financial-data-app
 2. **Install Dependencies
 
     ```bash
@@ -41,14 +42,3 @@ You can view the deployed app here:
     npm run dev
 This will start the app in development mode. Open http://localhost:3000 in your browser (or the URL shown in the terminal).
 
-4. **Build for Production
-
-     ```bash
-    npm run build
-This creates a production-ready build in the dist folder.
-
-5. **Preview the Production Build
-
-    ```bash
-    npm run preview
-This previews the build at the URL provided in the terminal.
